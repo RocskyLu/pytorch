@@ -15,13 +15,13 @@ import cimodel.data.dimensions as dimensions
 
 LINKING_DIMENSIONS = [
     "shared",
-    "static",
+    # "static",
 ]
 
 
 DEPS_INCLUSION_DIMENSIONS = [
     "with-deps",
-    "without-deps",
+    # "without-deps",
 ]
 
 
@@ -30,42 +30,42 @@ def get_processor_arch_name(gpu_version):
         "cu" + gpu_version.strip("cuda") if gpu_version.startswith("cuda") else gpu_version
     )
 
-LINUX_PACKAGE_VARIANTS = OrderedDict(
-    manywheel=[
-        "3.6m",
-        "3.7m",
-        "3.8m",
-        "3.9m"
-    ],
-    conda=dimensions.STANDARD_PYTHON_VERSIONS,
-    libtorch=[
-        "3.7m",
-    ],
-)
+# LINUX_PACKAGE_VARIANTS = OrderedDict(
+#     manywheel=[
+#         "3.6m",
+#         "3.7m",
+#         "3.8m",
+#         "3.9m"
+#     ],
+#     conda=dimensions.STANDARD_PYTHON_VERSIONS,
+#     libtorch=[
+#         "3.7m",
+#     ],
+# )
 
 CONFIG_TREE_DATA = OrderedDict(
-    linux=(dimensions.GPU_VERSIONS, LINUX_PACKAGE_VARIANTS),
-    macos=([None], OrderedDict(
-        wheel=dimensions.STANDARD_PYTHON_VERSIONS,
-        conda=dimensions.STANDARD_PYTHON_VERSIONS,
-        libtorch=[
-            "3.7",
-        ],
-    )),
-    macos_arm64=([None], OrderedDict(
-        wheel=[
-            "3.8",
-        ],
-        conda=[
-            "3.8",
-        ],
-    )),
+    # linux=(dimensions.GPU_VERSIONS, LINUX_PACKAGE_VARIANTS),
+    # macos=([None], OrderedDict(
+    #     wheel=dimensions.STANDARD_PYTHON_VERSIONS,
+    #     conda=dimensions.STANDARD_PYTHON_VERSIONS,
+    #     libtorch=[
+    #         "3.7",
+    #     ],
+    # )),
+    # macos_arm64=([None], OrderedDict(
+    #     wheel=[
+    #         "3.8",
+    #     ],
+    #     conda=[
+    #         "3.8",
+    #     ],
+    # )),
     # Skip CUDA-9.2 builds on Windows
     windows=(
         [v for v in dimensions.GPU_VERSIONS if v not in ['cuda92'] + dimensions.ROCM_VERSION_LABELS],
         OrderedDict(
-            wheel=dimensions.STANDARD_PYTHON_VERSIONS,
-            conda=dimensions.STANDARD_PYTHON_VERSIONS,
+            # wheel=dimensions.STANDARD_PYTHON_VERSIONS,
+            # conda=dimensions.STANDARD_PYTHON_VERSIONS,
             libtorch=[
                 "3.7",
             ],
@@ -80,17 +80,17 @@ CONFIG_TREE_DATA = OrderedDict(
 # because it understands avx512, which is needed for good fbgemm performance.
 #
 # Libtorch with new gcc ABI is built with gcc 5.4 on Ubuntu 16.04.
-LINUX_GCC_CONFIG_VARIANTS = OrderedDict(
-    manywheel=['devtoolset7'],
-    conda=['devtoolset7'],
-    libtorch=[
-        "devtoolset7",
-        "gcc5.4_cxx11-abi",
-    ],
-)
+# LINUX_GCC_CONFIG_VARIANTS = OrderedDict(
+#     manywheel=['devtoolset7'],
+#     conda=['devtoolset7'],
+#     libtorch=[
+#         "devtoolset7",
+#         "gcc5.4_cxx11-abi",
+#     ],
+# )
 
 WINDOWS_LIBTORCH_CONFIG_VARIANTS = [
-    "debug",
+    # "debug",
     "release",
 ]
 
