@@ -15,12 +15,12 @@ parameters:
     type: boolean
     default: true
 
-# docker_config_defaults: &docker_config_defaults
-#   user: jenkins
-#   aws_auth:
-#     # This IAM user only allows read-write access to ECR
-#     aws_access_key_id: ${CIRCLECI_AWS_ACCESS_KEY_FOR_ECR_READ_WRITE_V4}
-#     aws_secret_access_key: ${CIRCLECI_AWS_SECRET_KEY_FOR_ECR_READ_WRITE_V4}
+docker_config_defaults: &docker_config_defaults
+  user: jenkins
+  aws_auth:
+    # This IAM user only allows read-write access to ECR
+    aws_access_key_id: ${CIRCLECI_AWS_ACCESS_KEY_FOR_ECR_READ_WRITE_V4}
+    aws_secret_access_key: ${CIRCLECI_AWS_SECRET_KEY_FOR_ECR_READ_WRITE_V4}
 
 executors:
   windows-with-nvidia-gpu:
@@ -42,14 +42,14 @@ executors:
       shell: bash.exe
 commands:
 
-  # calculate_docker_image_tag:
-  #   description: "Calculates the docker image tag"
-  #   steps:
-  #     - run:
-  #         name: "Calculate docker image hash"
-  #         command: |
-  #           DOCKER_TAG=$(git rev-parse HEAD:.circleci/docker)
-  #           echo "DOCKER_TAG=${DOCKER_TAG}" >> "${BASH_ENV}"
+  calculate_docker_image_tag:
+    description: "Calculates the docker image tag"
+    steps:
+      - run:
+          name: "Calculate docker image hash"
+          command: |
+            DOCKER_TAG=$(git rev-parse HEAD:.circleci/docker)
+            echo "DOCKER_TAG=${DOCKER_TAG}" >> "${BASH_ENV}"
 
   designate_upload_channel:
     description: "inserts the correct upload channel into ${BASH_ENV}"
@@ -139,41 +139,41 @@ commands:
   #     - brew_install:
   #         formulae: libtool
 
-  optional_merge_target_branch:
-    steps:
-      - run:
-          name: (Optional) Merge target branch
-          no_output_timeout: "10m"
-          command: |
-            if [[ -n "$CIRCLE_PULL_REQUEST" && "$CIRCLE_BRANCH" != "nightly" ]]; then
-              PR_NUM=$(basename $CIRCLE_PULL_REQUEST)
-              CIRCLE_PR_BASE_BRANCH=$(curl -s https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUM | jq -r '.base.ref')
-              if [[ "${BUILD_ENVIRONMENT}" == *"xla"* || "${BUILD_ENVIRONMENT}" == *"gcc5"* ]] ; then
-                set -x
-                git config --global user.email "circleci.ossci@gmail.com"
-                git config --global user.name "CircleCI"
-                git config remote.origin.url https://github.com/pytorch/pytorch.git
-                git config --add remote.origin.fetch +refs/heads/release/1.8:refs/remotes/origin/release/1.8
-                git fetch --tags --progress https://github.com/pytorch/pytorch.git +refs/heads/release/1.8:refs/remotes/origin/release/1.8 --depth=100 --quiet
-                # PRs generated from ghstack has format CIRCLE_PR_BASE_BRANCH=gh/xxx/1234/base
-                if [[ "${CIRCLE_PR_BASE_BRANCH}" == "gh/"* ]]; then
-                  CIRCLE_PR_BASE_BRANCH=release/1.8
-                fi
-                export GIT_MERGE_TARGET=`git log -n 1 --pretty=format:"%H" origin/$CIRCLE_PR_BASE_BRANCH`
-                echo "GIT_MERGE_TARGET: " ${GIT_MERGE_TARGET}
-                export GIT_COMMIT=${CIRCLE_SHA1}
-                echo "GIT_COMMIT: " ${GIT_COMMIT}
-                git checkout -f ${GIT_COMMIT}
-                git reset --hard ${GIT_COMMIT}
-                git merge --allow-unrelated-histories --no-edit --no-ff ${GIT_MERGE_TARGET}
-                echo "Merged $CIRCLE_PR_BASE_BRANCH branch before building in environment $BUILD_ENVIRONMENT"
-                set +x
-              else
-                echo "No need to merge with $CIRCLE_PR_BASE_BRANCH, skipping..."
-              fi
-            else
-              echo "This is not a pull request, skipping..."
-            fi
+  # optional_merge_target_branch:
+  #   steps:
+  #     - run:
+  #         name: (Optional) Merge target branch
+  #         no_output_timeout: "10m"
+  #         command: |
+  #           if [[ -n "$CIRCLE_PULL_REQUEST" && "$CIRCLE_BRANCH" != "nightly" ]]; then
+  #             PR_NUM=$(basename $CIRCLE_PULL_REQUEST)
+  #             CIRCLE_PR_BASE_BRANCH=$(curl -s https://api.github.com/repos/$CIRCLE_PROJECT_USERNAME/$CIRCLE_PROJECT_REPONAME/pulls/$PR_NUM | jq -r '.base.ref')
+  #             if [[ "${BUILD_ENVIRONMENT}" == *"xla"* || "${BUILD_ENVIRONMENT}" == *"gcc5"* ]] ; then
+  #               set -x
+  #               git config --global user.email "circleci.ossci@gmail.com"
+  #               git config --global user.name "CircleCI"
+  #               git config remote.origin.url https://github.com/pytorch/pytorch.git
+  #               git config --add remote.origin.fetch +refs/heads/release/1.8:refs/remotes/origin/release/1.8
+  #               git fetch --tags --progress https://github.com/pytorch/pytorch.git +refs/heads/release/1.8:refs/remotes/origin/release/1.8 --depth=100 --quiet
+  #               # PRs generated from ghstack has format CIRCLE_PR_BASE_BRANCH=gh/xxx/1234/base
+  #               if [[ "${CIRCLE_PR_BASE_BRANCH}" == "gh/"* ]]; then
+  #                 CIRCLE_PR_BASE_BRANCH=release/1.8
+  #               fi
+  #               export GIT_MERGE_TARGET=`git log -n 1 --pretty=format:"%H" origin/$CIRCLE_PR_BASE_BRANCH`
+  #               echo "GIT_MERGE_TARGET: " ${GIT_MERGE_TARGET}
+  #               export GIT_COMMIT=${CIRCLE_SHA1}
+  #               echo "GIT_COMMIT: " ${GIT_COMMIT}
+  #               git checkout -f ${GIT_COMMIT}
+  #               git reset --hard ${GIT_COMMIT}
+  #               git merge --allow-unrelated-histories --no-edit --no-ff ${GIT_MERGE_TARGET}
+  #               echo "Merged $CIRCLE_PR_BASE_BRANCH branch before building in environment $BUILD_ENVIRONMENT"
+  #               set +x
+  #             else
+  #               echo "No need to merge with $CIRCLE_PR_BASE_BRANCH, skipping..."
+  #             fi
+  #           else
+  #             echo "This is not a pull request, skipping..."
+  #           fi
 
   # upload_binary_size_for_android_build:
   #   description: "Upload binary size data for Android build"
@@ -1262,3 +1262,4 @@ workflows:
       #           - postnightly
       #     name: update_s3_htmls
     when: << pipeline.parameters.run_build >>
+
