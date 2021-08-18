@@ -1,13 +1,13 @@
 commands:
 
-  calculate_docker_image_tag:
-    description: "Calculates the docker image tag"
-    steps:
-      - run:
-          name: "Calculate docker image hash"
-          command: |
-            DOCKER_TAG=$(git rev-parse HEAD:.circleci/docker)
-            echo "DOCKER_TAG=${DOCKER_TAG}" >> "${BASH_ENV}"
+  # calculate_docker_image_tag:
+  #   description: "Calculates the docker image tag"
+  #   steps:
+  #     - run:
+  #         name: "Calculate docker image hash"
+  #         command: |
+  #           DOCKER_TAG=$(git rev-parse HEAD:.circleci/docker)
+  #           echo "DOCKER_TAG=${DOCKER_TAG}" >> "${BASH_ENV}"
 
   designate_upload_channel:
     description: "inserts the correct upload channel into ${BASH_ENV}"
@@ -39,63 +39,63 @@ commands:
           no_output_timeout: "1h"
           command: .circleci/scripts/setup_ci_environment.sh
 
-  brew_update:
-    description: "Update Homebrew and install base formulae"
-    steps:
-      - run:
-          name: Update Homebrew
-          no_output_timeout: "10m"
-          command: |
-            set -ex
+  # brew_update:
+  #   description: "Update Homebrew and install base formulae"
+  #   steps:
+  #     - run:
+  #         name: Update Homebrew
+  #         no_output_timeout: "10m"
+  #         command: |
+  #           set -ex
 
-            # Update repositories manually.
-            # Running `brew update` produces a comparison between the
-            # current checkout and the updated checkout, which takes a
-            # very long time because the existing checkout is 2y old.
-            for path in $(find /usr/local/Homebrew -type d -name .git)
-            do
-            cd $path/..
-            git fetch --depth=1 origin
-            git reset --hard origin/master
-            done
+  #           # Update repositories manually.
+  #           # Running `brew update` produces a comparison between the
+  #           # current checkout and the updated checkout, which takes a
+  #           # very long time because the existing checkout is 2y old.
+  #           for path in $(find /usr/local/Homebrew -type d -name .git)
+  #           do
+  #           cd $path/..
+  #           git fetch --depth=1 origin
+  #           git reset --hard origin/master
+  #           done
 
-            export HOMEBREW_NO_AUTO_UPDATE=1
+  #           export HOMEBREW_NO_AUTO_UPDATE=1
 
-            # Install expect and moreutils so that we can call `unbuffer` and `ts`.
-            # moreutils installs a `parallel` executable by default, which conflicts
-            # with the executable from the GNU `parallel`, so we must unlink GNU
-            # `parallel` first, and relink it afterwards.
-            brew unlink parallel
-            brew install moreutils
-            brew link parallel --overwrite
-            brew install expect
+  #           # Install expect and moreutils so that we can call `unbuffer` and `ts`.
+  #           # moreutils installs a `parallel` executable by default, which conflicts
+  #           # with the executable from the GNU `parallel`, so we must unlink GNU
+  #           # `parallel` first, and relink it afterwards.
+  #           brew unlink parallel
+  #           brew install moreutils
+  #           brew link parallel --overwrite
+  #           brew install expect
 
-  brew_install:
-    description: "Install Homebrew formulae"
-    parameters:
-      formulae:
-        type: string
-        default: ""
-    steps:
-      - run:
-          name: Install << parameters.formulae >>
-          no_output_timeout: "10m"
-          command: |
-            set -ex
-            export HOMEBREW_NO_AUTO_UPDATE=1
-            brew install << parameters.formulae >>
+  # brew_install:
+  #   description: "Install Homebrew formulae"
+  #   parameters:
+  #     formulae:
+  #       type: string
+  #       default: ""
+  #   steps:
+  #     - run:
+  #         name: Install << parameters.formulae >>
+  #         no_output_timeout: "10m"
+  #         command: |
+  #           set -ex
+  #           export HOMEBREW_NO_AUTO_UPDATE=1
+  #           brew install << parameters.formulae >>
 
-  run_brew_for_macos_build:
-    steps:
-      - brew_update
-      - brew_install:
-          formulae: libomp
+  # run_brew_for_macos_build:
+  #   steps:
+  #     - brew_update
+  #     - brew_install:
+  #         formulae: libomp
 
-  run_brew_for_ios_build:
-    steps:
-      - brew_update
-      - brew_install:
-          formulae: libtool
+  # run_brew_for_ios_build:
+  #   steps:
+  #     - brew_update
+  #     - brew_install:
+  #         formulae: libtool
 
   optional_merge_target_branch:
     steps:
@@ -133,42 +133,42 @@ commands:
               echo "This is not a pull request, skipping..."
             fi
 
-  upload_binary_size_for_android_build:
-    description: "Upload binary size data for Android build"
-    parameters:
-      build_type:
-        type: string
-        default: ""
-      artifacts:
-        type: string
-        default: ""
-    steps:
-      - run:
-          name: "Binary Size - Install Dependencies"
-          no_output_timeout: "5m"
-          command: |
-            retry () {
-              $* || (sleep 1 && $*) || (sleep 2 && $*) || (sleep 4 && $*) || (sleep 8 && $*)
-            }
-            retry pip3 install requests
-      - run:
-          name: "Binary Size - Untar Artifacts"
-          no_output_timeout: "5m"
-          command: |
-            # The artifact file is created inside docker container, which contains the result binaries.
-            # Now unpackage it into the project folder. The subsequent script will scan project folder
-            # to locate result binaries and report their sizes.
-            # If artifact file is not provided it assumes that the project folder has been mounted in
-            # the docker during build and already contains the result binaries, so this step can be skipped.
-            export ARTIFACTS="<< parameters.artifacts >>"
-            if [ -n "${ARTIFACTS}" ]; then
-              tar xf "${ARTIFACTS}" -C ~/project
-            fi
-      - run:
-          name: "Binary Size - Upload << parameters.build_type >>"
-          no_output_timeout: "5m"
-          command: |
-            cd ~/project
-            export ANDROID_BUILD_TYPE="<< parameters.build_type >>"
-            export COMMIT_TIME=$(git log --max-count=1 --format=%ct || echo 0)
-            python3 .circleci/scripts/upload_binary_size_to_scuba.py android
+  # upload_binary_size_for_android_build:
+  #   description: "Upload binary size data for Android build"
+  #   parameters:
+  #     build_type:
+  #       type: string
+  #       default: ""
+  #     artifacts:
+  #       type: string
+  #       default: ""
+  #   steps:
+  #     - run:
+  #         name: "Binary Size - Install Dependencies"
+  #         no_output_timeout: "5m"
+  #         command: |
+  #           retry () {
+  #             $* || (sleep 1 && $*) || (sleep 2 && $*) || (sleep 4 && $*) || (sleep 8 && $*)
+  #           }
+  #           retry pip3 install requests
+  #     - run:
+  #         name: "Binary Size - Untar Artifacts"
+  #         no_output_timeout: "5m"
+  #         command: |
+  #           # The artifact file is created inside docker container, which contains the result binaries.
+  #           # Now unpackage it into the project folder. The subsequent script will scan project folder
+  #           # to locate result binaries and report their sizes.
+  #           # If artifact file is not provided it assumes that the project folder has been mounted in
+  #           # the docker during build and already contains the result binaries, so this step can be skipped.
+  #           export ARTIFACTS="<< parameters.artifacts >>"
+  #           if [ -n "${ARTIFACTS}" ]; then
+  #             tar xf "${ARTIFACTS}" -C ~/project
+  #           fi
+  #     - run:
+  #         name: "Binary Size - Upload << parameters.build_type >>"
+  #         no_output_timeout: "5m"
+  #         command: |
+  #           cd ~/project
+  #           export ANDROID_BUILD_TYPE="<< parameters.build_type >>"
+  #           export COMMIT_TIME=$(git log --max-count=1 --format=%ct || echo 0)
+  #           python3 .circleci/scripts/upload_binary_size_to_scuba.py android

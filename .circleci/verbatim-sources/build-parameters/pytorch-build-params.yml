@@ -22,29 +22,29 @@ pytorch_params: &pytorch_params
     BUILD_ONLY: << parameters.build_only >>
   resource_class: << parameters.resource_class >>
 
-pytorch_ios_params: &pytorch_ios_params
-  parameters:
-    build_environment:
-      type: string
-      default: ""
-    ios_arch:
-      type: string
-      default: ""
-    ios_platform:
-      type: string
-      default: ""
-    op_list:
-      type: string
-      default: ""
-    use_metal:
-      type: string
-      default: "0"
-  environment:
-    BUILD_ENVIRONMENT: << parameters.build_environment >>
-    IOS_ARCH: << parameters.ios_arch >>
-    IOS_PLATFORM: << parameters.ios_platform >>
-    SELECTED_OP_LIST: << parameters.op_list >>
-    USE_PYTORCH_METAL: << parameters.use_metal >>
+# pytorch_ios_params: &pytorch_ios_params
+#   parameters:
+#     build_environment:
+#       type: string
+#       default: ""
+#     ios_arch:
+#       type: string
+#       default: ""
+#     ios_platform:
+#       type: string
+#       default: ""
+#     op_list:
+#       type: string
+#       default: ""
+#     use_metal:
+#       type: string
+#       default: "0"
+#   environment:
+#     BUILD_ENVIRONMENT: << parameters.build_environment >>
+#     IOS_ARCH: << parameters.ios_arch >>
+#     IOS_PLATFORM: << parameters.ios_platform >>
+#     SELECTED_OP_LIST: << parameters.op_list >>
+#     USE_PYTORCH_METAL: << parameters.use_metal >>
 
 pytorch_windows_params: &pytorch_windows_params
   parameters:
