@@ -65,6 +65,7 @@ CONFIG_TREE_DATA = OrderedDict(
         [v for v in dimensions.GPU_VERSIONS if v not in ['cuda92'] + dimensions.ROCM_VERSION_LABELS],
         OrderedDict(
             # wheel=dimensions.STANDARD_PYTHON_VERSIONS,
+            wheel=["3.7"],
             # conda=dimensions.STANDARD_PYTHON_VERSIONS,
             libtorch=[
                 "3.7",
